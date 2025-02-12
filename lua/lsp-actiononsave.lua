@@ -30,6 +30,9 @@ function l.execute_code_action_sync(bufnr, client, action_name)
     if result.edit then
       vim.lsp.util.apply_workspace_edit(result.edit, client.offset_encoding or "utf-16")
     end
+    if result.command then
+      client.exec_cmd(result.command, { bufnr = bufnr })
+    end
   end
 end
 
