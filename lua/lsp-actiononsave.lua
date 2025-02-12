@@ -8,7 +8,7 @@ local l = {}
 
 function l.format_sync(bufnr, client)
   if l.verbose then
-    print("[lsp-actiononsave] (" .. client.name .. ") Formatting…")
+    vim.notify("[lsp-actiononsave] (" .. client.name .. ") Formatting…")
   end
 
   vim.lsp.buf.format({
@@ -20,7 +20,7 @@ end
 
 function l.execute_code_action_sync(bufnr, client, action_name)
   if l.verbose then
-    print("[lsp-actiononsave] (" .. client.name .. ') Executing "codeAction/' .. action_name .. '"…')
+    vim.notify("[lsp-actiononsave] (" .. client.name .. ') Executing "codeAction/' .. action_name .. '"…')
   end
   local params = vim.lsp.util.make_range_params()
   params.context = { only = { action_name }, diagnostics = {} }
