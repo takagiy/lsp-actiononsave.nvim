@@ -7,9 +7,6 @@ local M = {}
 local l = {}
 
 function l.format_sync(bufnr, client)
-  if not client:supports_method("textDocument/formatting", bufnr) then
-    return
-  end
   if l.verbose then
     print("[lsp-actiononsave] (" .. client.name .. ") Formatting…")
   end
@@ -23,7 +20,7 @@ end
 
 function l.execute_code_action_sync(bufnr, client, action_name)
   if l.verbose then
-    print("[lsp-actiononsave] (" .. client.name .. ") Executing \"codeAction/" .. action_name .. "\"…")
+    print("[lsp-actiononsave] (" .. client.name .. ') Executing "codeAction/' .. action_name .. '"…')
   end
   local params = vim.lsp.util.make_range_params()
   params.context = { only = { action_name }, diagnostics = {} }
@@ -63,6 +60,10 @@ function M.setup(opts)
       local bufnr = ev.buf
       for _, client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do
         local actions = opts.servers[client.name] or {}
+        if type(actions) == "function" then
+          local ft, _ = vim.filetype.match({ buf = bufnr })
+          actions = actions(ft)
+        end
         for _, action in pairs(actions) do
           l.process_action(action, bufnr, client)
         end
