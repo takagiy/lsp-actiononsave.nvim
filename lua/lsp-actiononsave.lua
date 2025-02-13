@@ -47,12 +47,10 @@ function l.process_action(action, bufnr, client)
 end
 
 function M.setup(opts)
-  if opts == nil then
-    opts = {}
-  end
-  if opts.servers == nil then
-    opts.servers = {}
-  end
+  opts = vim.tbl_extend("force", {
+    verbose = false,
+    servers = {},
+  }, opts or {})
 
   if opts.verbose then
     l.verbose = true
@@ -64,7 +62,7 @@ function M.setup(opts)
       for _, client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do
         local actions = opts.servers[client.name] or {}
         if type(actions) == "function" then
-          local ft, _ = vim.filetype.match({ buf = bufnr })
+          local ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
           actions = actions(ft)
         end
         for _, action in pairs(actions) do
