@@ -17,6 +17,8 @@ NeoVim Lua plugin that performs LSP code actions and code formatting when saving
 
 ```lua
 opts = {
+    -- Enable notifications
+    verbose = true,
     -- Table of LSP servers
     servers = {
         -- Server name
