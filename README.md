@@ -2,6 +2,9 @@
 
 NeoVim Lua plugin that performs LSP code actions and code formatting when saving files
 
+![](https://github.com/user-attachments/assets/326ebe1b-005c-48ef-a832-8c5628eaeff9)
+
+
 ## Installation
 
 ### Lazy.nvim
