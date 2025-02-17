@@ -25,19 +25,22 @@ opts = {
     -- Table of language servers
     servers = {
         -- Server name
-        biome = {
+        ts_ls = {
             -- Table of actions to perform
             "format",
             "codeAction/source.organizeImports",
             "codeAction/source.fixAll",
+        },
+        biome = {
+            "format",
+            "codeAction/source.organizeImports",
+            "codeAction/source.fixAll",
             -- Skip some other language servers if this server is active (optional. string or table of strings)
-            skip = "null-ls",
+            skip = "ts_ls",
         },
         -- Function that takes a filetype and returns a table of actions to perform
         ["null-ls"] = function(ft)
             if ft == "lua" then
-                return { "format" }
-            elseif ft == "typescript" then
                 return { "format" }
             end
             return {}
