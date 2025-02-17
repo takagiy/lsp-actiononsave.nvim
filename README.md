@@ -37,6 +37,8 @@ opts = {
         ["null-ls"] = function(ft)
             if ft == "lua" then
                 return { "format" }
+            elseif ft == "typescript" then
+                return { "format" }
             end
             return {}
         end,
