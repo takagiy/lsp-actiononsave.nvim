@@ -46,6 +46,49 @@ function l.process_action(action, bufnr, client)
   end
 end
 
+function l.for_each_server_options(server_options, bufnr, callback)
+  local active_clients = vim.lsp.get_clients({ bufnr = bufnr })
+  for _, client in pairs(active_clients) do
+    local actions = server_options[client.name] or {}
+    if type(actions) == "function" then
+      local ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
+      actions = actions(ft)
+    end
+
+    callback(actions, client)
+  end
+end
+
+function l.create_filter(server_options, bufnr)
+  local skip = {}
+
+  l.for_each_server_options(server_options, bufnr, function(actions)
+    if type(actions.skip) == "string" then
+      skip[actions.skip] = true
+    elseif type(actions.skip) == "table" then
+      for _, name in pairs(actions.skip) do
+        skip[name] = true
+      end
+    end
+  end)
+
+  return skip
+end
+
+function l.process_actions_by_clients(server_options, bufnr, skip)
+  l.for_each_server_options(server_options, bufnr, function(actions, client)
+    if skip[client.name] then
+      return
+    end
+
+    for key, action in pairs(actions) do
+      if key ~= "skip" then
+        l.process_action(action, bufnr, client)
+      end
+    end
+  end)
+end
+
 function M.setup(opts)
   opts = vim.tbl_extend("force", {
     verbose = false,
@@ -59,16 +102,8 @@ function M.setup(opts)
   vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function(ev)
       local bufnr = ev.buf
-      for _, client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-        local actions = opts.servers[client.name] or {}
-        if type(actions) == "function" then
-          local ft = vim.api.nvim_get_option_value("filetype", { buf = bufnr })
-          actions = actions(ft)
-        end
-        for _, action in pairs(actions) do
-          l.process_action(action, bufnr, client)
-        end
-      end
+      local skip = l.create_filter(opts.servers, bufnr)
+      l.process_actions_by_clients(opts.servers, bufnr, skip)
     end,
   })
 end
